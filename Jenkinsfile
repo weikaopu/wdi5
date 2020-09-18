@@ -10,7 +10,7 @@ def pipeline(){
     node("linux"){
 
     stage("checkout repository"){
-        git url: "https://github.com/js-soft/wdi5.git"
+        git url: "https://github.com/js-soft/wdi5.git", branch: "develop"
     }
 
 	stage("install dependencies"){
