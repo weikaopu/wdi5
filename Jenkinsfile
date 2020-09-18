@@ -9,6 +9,10 @@ try{
 def pipeline(){
     node("linux"){
 
+    stage("checkout repository"){
+        git url: "https://github.com/js-soft/wdi5.git"
+    }
+
 	stage("install dependencies"){
 	    sh "npm install"
 	}
