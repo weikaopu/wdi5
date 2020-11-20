@@ -8,18 +8,11 @@ try{
 
 
 def pipeline(){
-
-    parallel
-        ios: {
-            node("ios"){
-                build("ios")
-            }
-        },
-        android : {
-            node("linux"){
-                build("android")
-            }
+    parallel android : {
+        node("linux"){
+            build("android")
         }
+    }
 }
 
 def build(platform){
@@ -34,6 +27,10 @@ def build(platform){
 
 def test(platform){
     stage("test $platform"){
+<<<<<<< HEAD
         sh "npm run test:${platform}:bs"
+=======
+        sh "npm run test:android:bs"
+>>>>>>> feat: build in parallel
     }
 }
