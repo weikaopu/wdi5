@@ -6,23 +6,34 @@ try{
     println e
 }
 
+
 def pipeline(){
-    node("linux"){
 
-    stage("checkout repository"){
+    parallel
+        ios: {
+            node("ios"){
+                build("ios")
+            }
+        },
+        android : {
+            node("linux"){
+                build("android")
+            }
+        }
+}
+
+def build(platform){
+    stage("build $platform"){
+        cleanWs()
         git url: "https://github.com/js-soft/wdi5.git", branch: "develop"
+
+        sh "npm install"
+        sh "npm run _build:${platform}_app"
     }
+}
 
-	stage("install dependencies"){
-	    sh "npm install"
-	}
-
-	stage("test android"){
-	    sh "npm run test:android:bs"
-	}
-
-	stage("test ios"){
-	    sh "npm run test:ios:bs"
-	}
+def test(platform){
+    stage("test $platform"){
+        sh "npm run test:${platform}:bs"
     }
 }
