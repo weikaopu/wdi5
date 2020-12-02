@@ -1,4 +1,4 @@
-const wdi5 = require('../../../../../index');
+const wdi5 = require('wdi5');
 const Main = require("./pageObjects/Main")
 
 describe('ui5 basic', () => {
@@ -10,7 +10,7 @@ describe('ui5 basic', () => {
 
     beforeEach(() => {
         wdi5().getLogger().log('beforeEach');
-        wdi5().getUtils().takeScreenshot('test-basic');
+        wdi5().getUtils().screenshot('test-basic');
     });
 
     /*

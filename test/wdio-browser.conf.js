@@ -1,5 +1,6 @@
 const path = require('path');
 require('dotenv').config()
+const WDI5Service = require('wdi5/lib/service/wdi5.service')
 
 exports.config = {
     // ==================================
@@ -20,10 +21,6 @@ exports.config = {
     //
     // Override default path ('/wd/hub') for chromedriver service.
     path: '/',
-    // hostname: 'localhost',
-    // port: 4444,
-    // Protocol: http | https
-    // protocol: 'http',
     //
     // =================
     // Service Providers
@@ -31,7 +28,6 @@ exports.config = {
     // WebdriverIO supports Sauce Labs, Browserstack, Testing Bot and LambdaTest. (Other cloud providers
     // should work, too.) These services define specific `user` and `key` (or access key)
     // values you must put here, in order to connect to these services.
-    //
     //
     // If you run your tests on SauceLabs you can specify the region you want to run your tests
     // in via the `region` property. Available short handles for regions are `us` (default) and `eu`.
@@ -49,6 +45,7 @@ exports.config = {
     // then the current working directory is where your `package.json` resides, so `wdio`
     // will be called from there.
     //
+
     specs: [path.join('test', 'ui5-app', 'webapp', 'test', 'e2e', '*.js')],
 
     // Patterns to exclude.
@@ -94,11 +91,13 @@ exports.config = {
         }
     ],
 
+    // TODO: move this to service instantiation?
     wdi5: {
         // path: "", // commented out to use the default paths
-        screenshotPath: './test/report/screenshots',
+        screenshotPath: path.join('test', 'report', 'screenshots'),
         logLevel: 'verbose', // error | verbose | silent
         platform: 'browser', // electron, browser, android, ios
+        url: "index.html",
         deviceType: 'web',
         capabilities: {
             // test
@@ -111,7 +110,8 @@ exports.config = {
                 format: 'EAN'
             },
             'custom-plugin': {
-                path: "./test/plugins/custom-plugin.js"
+                path: path.join('test', 'plugins', 'custom-plugin.js')
+                // path: "./test/plugins/custom-plugin.js"
             }
         }
     },
@@ -122,7 +122,10 @@ exports.config = {
     // commands. Instead, they hook themselves up into the test process.
     // Use the Appium plugin for Webdriver. Without this, we would need to run appium
     // separately on the command line.
-    services: ['chromedriver'], // cannot beeing started standalone // ./node_modules/chromedriver80/bin/chromedriver"
+    services: [
+        'chromedriver', // cannot beeing started standalone // ./node_modules/chromedriver80/bin/chromedriver"
+        [WDI5Service]
+    ],
     //
     // Additional list of node arguments to use when starting child processes
     execArgv: [],
@@ -186,56 +189,4 @@ exports.config = {
     // The only one supported by default is 'dot'
     // See also: https://webdriver.io/docs/dot-reporter.html , and click on "Reporters" in left column
     reporters: ['spec'],
-
-    //
-    // =====
-    // Hooks
-    // =====
-    // WebdriverIO provides a several hooks you can use to interfere the test process in order to enhance
-    // it and build services around it. You can either apply a single function to it or an array of
-    // methods. If one of them returns with a promise, WebdriverIO will wait until that promise is
-    // resolved to continue.
-    //
-    /**
-     * Gets executed before test execution begins. At this point you can access to all global
-     * variables like `browser`. It is the perfect place to define custom commands.
-     * @param {Array.<Object>} capabilities list of capabilities details
-     * @param {Array.<String>} specs List of spec file paths that are to be run
-     */
-    before: function (capabilities, specs) {
-        // load module
-        const wdi5 = require('../index');
-
-        // can this be done in config?
-        browser.url('index.html');
-
-        // create instance
-        wdi5(browser);
-
-        // log the config
-        wdi5()
-            .getLogger()
-            .log('configurations: ' + JSON.stringify(wdi5().getUtils().getConfig()));
-    },
-    /*
-     * Gets executed after all tests are done. You still have access to all global variables from
-     * the test.
-     * @param {Number} result 0 - test pass, 1 - test fail
-     * @param {Array.<Object>} capabilities list of capabilities details
-     * @param {Array.<String>} specs List of spec file paths that ran
-     */
-    after: function (result, capabilities, specs) {
-        // load module
-        const wdi5 = require('../index');
-        console.log('after hook');
-        if (result === 1) {
-            wdi5().getLogger().error('some tests failed');
-            // test failed
-            if (wdi5().getUtils().getConfig('logLevel') !== 'verbose') {
-                wdi5().getLogger().error('here is the full log');
-                // write log if loglevel is other than verbose
-                wdi5().getLogger().printLogStorage();
-            }
-        }
-    }
 };

@@ -1,24 +1,19 @@
 const path = require('path');
-require('dotenv').config()
+require('dotenv').config();
+const WDI5Service = require('wdi5/lib/service/wdi5.service');
 
 // https://github.com/electron-userland/spectron/issues/74
 exports.config = {
-    // runner: 'local',
     path: '/', // Path to driver server endpoint.
     host: 'localhost', // Use localhost as chrome driver server
     port: 9515, // "9515" is the port opened by chrome driver.
     specs: [path.join('test', 'ui5-app', 'webapp', 'test', 'e2e', '*.js')],
-    // bail: 0,
-    // directConnect: true,
-    // services: ['chromedriver'],
+    services: [[WDI5Service]],
     chromeDriverLogs: path.join('test', 'report', 'logs'),
     maxInstances: 1,
     reporters: ['spec'],
-    // logLevel: 'debug',
-    // sync: false,
     outputDir: path.join('test', 'report', 'logs'),
     coloredLogs: true,
-    screenshotPath: path.join('test', 'report', 'screenshots'),
     framework: 'mocha',
     mochaOpts: {
         timeout: 60000
@@ -30,6 +25,7 @@ exports.config = {
             'goog:chromeOptions': {
                 w3c: false,
                 binary: path.join(
+                    process.cwd(),
                     'test',
                     'ui5-app',
                     'app',
@@ -42,12 +38,13 @@ exports.config = {
                     'MacOS',
                     'UI5'
                 ),
-                args: ['remote-debugging-port=9222', "window-size=1440,800"]
+                args: ['remote-debugging-port=9222', 'window-size=1440,800']
             }
         }
     ],
     wdi5: {
         deviceType: 'web',
+        screenshotPath: path.join('test', 'report', 'screenshots'),
         logLevel: 'verbose',
         platform: 'electron',
         plugins: {
@@ -61,12 +58,5 @@ exports.config = {
                 format: 'EAN'
             }
         }
-    },
-    before: function (capabilities, specs) {
-        const wdi5 = require('../index');
-        wdi5(browser);
-        wdi5()
-            .getLogger()
-            .log('configurations: ' + JSON.stringify(wdi5().getUtils().getConfig()));
     }
 };

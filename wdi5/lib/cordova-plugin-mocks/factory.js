@@ -40,8 +40,8 @@ module.exports = {
         this._ = _;
         this._context = context;
 
-        this._injectPlugins(this._.getUtils().getConfig().plugins);
         this._platform = this._.getUtils().getConfig('platform');
+        this._injectPlugins(this._.getUtils().getConfig().plugins);
         this._pluginListConfig = this._getPluginConfig();
     },
 
@@ -101,22 +101,22 @@ module.exports = {
                 };
 
                 /**
-                 * set any value to the window.wdi5.plugins[pluginName]['dynResp']
+                 * set any value to the window.wdi5.plugins[pluginName]
                  * @param {String} pluginName
                  * @param {*} resp
                  */
                 window.wdi5.setPluginMockReponse = (pluginName, resp) => {
-                    window.wdi5.plugins[pluginName]['dynResp'] = resp;
+                    window.wdi5.plugins[pluginName] = resp;
                 };
 
                 /**
-                 * returns any value contained in the window.wdi5.plugins[pluginName]['dynResp'] object
+                 * returns any value contained in the window.wdi5.plugins[pluginName] object
                  * @param {String} pluginName
                  * @return {*}
                  */
                 window.wdi5.getPluginMockResponse = (pluginName) => {
-                    return window.wdi5.plugins[pluginName]['dynResp']
-                }
+                    return window.wdi5.plugins[pluginName];
+                };
 
                 done(true);
             } catch (e) {
@@ -162,16 +162,19 @@ module.exports = {
      * @returns the result of node.js require of the file with name of the parameter
      */
     _loadPluginWithName(pluginName, config) {
-
         let path = `./${pluginName}`;
         if (config.path) {
             // set custom path if existent
-            if (config.path.indexOf(".js") !== -1) {
+            if (config.path.indexOf('.js') !== -1) {
                 // cut the .js file ending
                 var file = config.path.substring(0, config.path.length - 3);
             }
-            path = "../../" + file;
+            // TODO: not working with node debugger (launch.json)
+            path = process.cwd() + '/' + file;
         }
+
+        console.log('--------- plugin factory: working directory ---------');
+        console.log('path:' + path);
 
         // load from plugin config list
         return require(`${path}`);
@@ -223,10 +226,14 @@ module.exports = {
      * @return {*} result of the execution
      */
     setPluginMockReponse(pluginName, response) {
-        const result = this._context.executeAsync((pluginName, response, done) => {
-            window.wdi5.setPluginMockReponse(pluginName, response)
-            done();
-        }, pluginName, response);
+        const result = this._context.executeAsync(
+            (pluginName, response, done) => {
+                window.wdi5.setPluginMockReponse(pluginName, response);
+                done();
+            },
+            pluginName,
+            response
+        );
 
         return result;
     }

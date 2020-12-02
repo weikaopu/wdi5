@@ -1,7 +1,3 @@
-// @ts-check
-const logger = require('./Logger');
-const { WebDriver } = require('selenium-webdriver');
-
 /**
  * This is a bridge object to use from selector to UI5 control
  * This can be seen as a generic representation of a UI5 control used to interact with the UI5 control
@@ -37,7 +33,7 @@ module.exports = class WDI5 {
         this._wdio_ui5_key = controlSelector.wdio_ui5_key;
 
         // fire getControl just once when creating this webui5 object
-        const controlResult = this._getControl()
+        const controlResult = this._getControl();
         this._webElement = controlResult[0];
 
         // dynamic function bridge
@@ -92,19 +88,25 @@ module.exports = class WDI5 {
      */
     _retrieveElements(aControls, context = this._context) {
         let aResult = [];
-        // loop through items
-        aControls.forEach((item) => {
-            // item id -> create selector
-            const selector = {
-                wdio_ui5_key: item.id, // plugin-internal, not part of RecordReplay.ControlSelector
-                selector: {
-                    id: item.id
-                }
-            };
 
-            // get WDI5 control
-            aResult.push(context.asControl(selector));
-        });
+        // check the validity of param
+        if (aControls) {
+            // loop through items
+            aControls.forEach((item) => {
+                // item id -> create selector
+                const selector = {
+                    wdio_ui5_key: item.id, // plugin-internal, not part of RecordReplay.ControlSelector
+                    selector: {
+                        id: item.id
+                    }
+                };
+
+                // get WDI5 control
+                aResult.push(context.asControl(selector));
+            });
+        } else {
+            console.warn(this._wdio_ui5_key + " has no aControls")
+        }
 
         return aResult;
     }
@@ -115,9 +117,14 @@ module.exports = class WDI5 {
      * @param {Array} sReplFunctionNames
      */
     _attachControlBridge(sReplFunctionNames) {
-        sReplFunctionNames.forEach(sMethodName => {
-            this[sMethodName] = this._executeControlMethod.bind(this, sMethodName, this._webElement, this._context);
-        });
+        // check the validity of param
+        if (sReplFunctionNames) {
+            sReplFunctionNames.forEach((sMethodName) => {
+                this[sMethodName] = this._executeControlMethod.bind(this, sMethodName, this._webElement, this._context);
+            });
+        } else {
+            console.warn(this._wdio_ui5_key + " has no sReplFunctionNames")
+        }
     }
 
     /**
@@ -132,8 +139,8 @@ module.exports = class WDI5 {
         // special case for custom data attached to a UI5 control:
         // pass the arguments to the event handler (like UI5 handles and expects them) also
         // also here in Node.js runtime
-        if (methodName === "fireEvent") {
-            if (typeof args[1]["eval"] === "function") {
+        if (methodName === 'fireEvent') {
+            if (typeof args[1]['eval'] === 'function') {
                 return this._fireEvent(args[0], args[1], webElement, context);
             }
         }
@@ -157,7 +164,11 @@ module.exports = class WDI5 {
                         done(['success', result, 'aggregation']);
                     } else {
                         if (result === undefined || result === null) {
-                            done(['error', `function ${methodName} does not exist on control ${metadata.getElementName()}!`, 'none']);
+                            done([
+                                'error',
+                                `function ${methodName} does not exist on control ${metadata.getElementName()}!`,
+                                'none'
+                            ]);
                         } else {
                             // result mus be a primitive
                             if (window.wdi5.isPrimitive(result)) {
@@ -167,7 +178,11 @@ module.exports = class WDI5 {
                                 // object, replacer function
                                 // TODO: create usefull content from result
                                 // result = JSON.stringify(result, window.wdi5.circularReplacer());
-                                done(['success', `instance of wdi5 representation of a ${metadata.getElementName()}`, 'element']);
+                                done([
+                                    'success',
+                                    `instance of wdi5 representation of a ${metadata.getElementName()}`,
+                                    'element'
+                                ]);
                             }
                         }
                     }
@@ -182,15 +197,15 @@ module.exports = class WDI5 {
         this._writeResultLog(result, methodName);
 
         switch (result[2]) {
-            case "element":
+            case 'element':
                 // return $self after a called method of the wdi5 instance to allow method chaining
                 return this;
-            case "result":
+            case 'result':
                 // return result on array index 1 anyways
                 return result[1];
-            case "aggregation": // also applies for getAggregation convenience methods such as $ui5control.getItems()
+            case 'aggregation': // also applies for getAggregation convenience methods such as $ui5control.getItems()
                 return this._retrieveElements(result[1]);
-            case "none":
+            case 'none':
                 return null;
             default:
                 return null;
@@ -373,10 +388,9 @@ module.exports = class WDI5 {
      * @param {WebdriverIO.BrowserObject} context
      */
     _fireEvent(eventName, oOptions, webElement = this._webElement, context = this._context) {
-
         // Check the options have a eval property
         if (oOptions && oOptions.eval) {
-            oOptions = '(' + oOptions.eval.toString() + ')'
+            oOptions = '(' + oOptions.eval.toString() + ')';
         }
 
         const result = context.executeAsync(
@@ -386,13 +400,11 @@ module.exports = class WDI5 {
                     // DOM to ui5
                     let oControl = window.wdi5.getUI5CtlForWebObj(webElement);
                     if (oControl && oControl.hasListeners(eventName)) {
-
                         window.wdi5.Log.info('[browser wdio-ui5] firing ' + eventName + ' on ' + webElement);
                         // element existent and has the target event
                         try {
-
                             // eval the options indicated by option of type string
-                            if (typeof oOptions === "string") {
+                            if (typeof oOptions === 'string') {
                                 oOptions = eval(oOptions)();
                             }
                             oControl.fireEvent(eventName, oOptions);
@@ -424,14 +436,20 @@ module.exports = class WDI5 {
      * @return {[WebdriverIO.Element | String, [aProtoFunctions]]} UI5 control or error message, array of function names of this control
      */
     _getControl(controlSelector = this._controlSelector, context = this._context) {
+        // check whether we have a "by id regex" locator request
+        if (controlSelector.selector.id && typeof controlSelector.selector.id === 'object') {
+            // make it a string for serializing into browser-scope and
+            // further processing there
+            controlSelector.selector.id = controlSelector.selector.id.toString();
+        }
         const result = context.executeAsync((controlSelector, done) => {
-
             window.bridge
                 .waitForUI5()
                 .then(() => {
                     window.wdi5.Log.info('[browser wdio-ui5] locating ' + JSON.stringify(controlSelector));
                     controlSelector.selector = window.wdi5.createMatcher(controlSelector.selector);
-                    return window.bridge.findDOMElementByControlSelector(controlSelector);
+                    const control = window.bridge.findDOMElementByControlSelector(controlSelector);
+                    return control;
                 })
                 .then((domElement) => {
                     window.wdi5.Log.info(
@@ -442,7 +460,6 @@ module.exports = class WDI5 {
                     const ui5Control = window.wdi5.getUI5CtlForWebObj(domElement);
                     const id = ui5Control.getId();
                     const aProtoFunctions = window.wdi5.retrieveControlMethods(ui5Control);
-
                     // @type [String, String?, String, "Array of Strings"]
                     done(['success', domElement, id, aProtoFunctions]);
                 })
@@ -453,7 +470,10 @@ module.exports = class WDI5 {
         }, controlSelector);
 
         // save the webdriver representation by control id
-        this._webdriverRepresentation = $(`#${result[2]}`);
+        if (result[2]) {
+            // only if the result is valid
+            this._webdriverRepresentation = $(`#${result[2]}`);
+        }
 
         this._writeResultLog(result, '_getControl()');
 
@@ -467,11 +487,11 @@ module.exports = class WDI5 {
      */
     _writeResultLog(result, functionName) {
         if (result[0] === 'error') {
-            logger.error(`ERROR: call of ${functionName} failed because of: ${result[1]}`);
+            console.error(`ERROR: call of ${functionName} failed because of: ${result[1]}`);
         } else if (result[0] === 'success') {
-            logger.log(`SUCCESS: call of function ${functionName} returned: ${JSON.stringify(result[1])}`);
+            console.log(`SUCCESS: call of function ${functionName} returned: ${JSON.stringify(result[1])}`);
         } else {
-            logger.warn(`Unknown status: ${functionName} returned: ${JSON.stringify(result[1])}`);
+            console.warn(`Unknown status: ${functionName} returned: ${JSON.stringify(result[1])}`);
         }
     }
 };

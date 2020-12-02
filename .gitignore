@@ -1,3 +1,5 @@
+yarn-error.log
+report/appium
 
 # Ignore Mac files
 .DS_Store
@@ -63,18 +65,20 @@ dist
 # WebStorm/IntelliJ IDE
 .idea
 
-# Report
+# Gitkeep generally
 !/**/.gitkeep
 
 # Testing
 !test/report/screenshots/.gitkeep
 test/report/screenshots/*.png
+!wdio-ui5-service/test/report/screenshots/.gitkeep
+wdio-ui5-service/test/report/screenshots/*.png
 test/report/logs/*.*
 !test/report/logs/.gitkeep
 test/report/appium/*.*
 !test/report/appium/.gitkeep
 
-# app building
+# App building
 test/ui5-app/app/hooks
 test/ui5-app/app/node_modules
 test/ui5-app/app/platforms
@@ -85,5 +89,5 @@ test/ui5-app/app/www
 .env
 !.env.example
 
-# ios build
+# iOS build
 test/ui5-app/app/build.json
