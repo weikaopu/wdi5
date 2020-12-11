@@ -107,7 +107,7 @@
             "type": "node",
             "program": "${workspaceFolder}/node_modules/.bin/wdio",
             "request": "launch",
-            "runtimeVersion": "12.19.0",
+            "runtimeVersion": "14.15.1",
             "args": [
                 "${workspaceFolder}/test/wdio-browser.conf.js",
                 "--spec",
