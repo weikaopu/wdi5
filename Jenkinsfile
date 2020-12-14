@@ -8,10 +8,19 @@ try{
 
 
 def pipeline(){
-    node("linux"){
-        withEnv(["ANDROID_HOME=/home/jenkins/Android/Sdk/", "ANDROID_SDK_ROOT=/home/jenkins/Android/Sdk/"]){
-            build("android")
-            test("android")
+    parallel android: {
+        node("linux"){
+            withEnv(getEnv("android")){
+                build("android")
+                test("android")
+            }
+        }
+    }, ios: {
+        node("mac"){
+            withEnv(getEnv("ios")){
+                build("ios")
+                test("ios")
+            }
         }
     }
 }
@@ -52,5 +61,14 @@ def test(platform){
 
             sh "yarn run test:${platform}:bs"
         }
+    }
+}
+
+
+def getEnv(platform){
+    if(platform == "ios"){
+        return ["PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:${tool 'Node lts/dubnium'}/bin:${env.PATH}"]
+    } else if(platform == "android"){
+        return ["ANDROID_HOME=/home/jenkins/Android/Sdk/", "ANDROID_SDK_ROOT=/home/jenkins/Android/Sdk/"]
     }
 }
