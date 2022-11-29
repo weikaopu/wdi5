@@ -11,6 +11,23 @@ describe("ui5 aggregation retrieval", () => {
         browser.screenshot("aggregation")
     })
 
+    it.only("test filterbar", async () => {
+        const filterBar = await browser.asControl({
+            selector: {
+                id: "filterbar",
+                viewName: "test.Sample.view.Other"
+            }
+            // forceSelect: true
+        })
+
+        const fiterGroupItems = await filterBar.getFilterGroupItems()
+
+        const firstFlterGroupItem = fiterGroupItems[0]
+        const firstLabel = await firstFlterGroupItem.getLabel()
+
+        expect(firstLabel).toEqual("CustomerName")
+    })
+
     it("select controls of a sap.m.Page's content aggregation", async () => {
         // goal: assert that .getContent() and .getAggregation("items") work the same
         // including access via the fluent async api

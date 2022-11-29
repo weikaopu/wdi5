@@ -319,6 +319,11 @@ async function clientSide_injectUI5(config, waitForUI5Timeout, browserInstance) 
                                 return {
                                     id: `${element.getId()}-CLI`
                                 }
+                            } else if (controlType === "sap.ui.comp.filterbar.FilterBar") {
+                                return {
+                                    id: element.getId(),
+                                    type: "sap.ui.comp.filterbar.FilterBar"
+                                }
                             } else {
                                 return {
                                     id: element.getId()

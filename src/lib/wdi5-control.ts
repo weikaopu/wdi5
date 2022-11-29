@@ -390,7 +390,8 @@ export class WDI5Control {
                     wdio_ui5_key: item.id, // plugin-internal, not part of RecordReplay.ControlSelector
                     forceSelect: this._forceSelect,
                     selector: {
-                        id: item.id
+                        id: item.id,
+                        type: item.type
                     }
                 }
 
