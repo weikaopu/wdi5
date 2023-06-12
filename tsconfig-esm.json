@@ -2,9 +2,9 @@
   "compilerOptions": {
     "rootDir": "src",
     "esModuleInterop": true,
-    "target": "ESNext",
+    "target": "ES2022",
     "outDir": "dist/mjs",
-    "module": "ESNext",
+    "module": "ES2022",
     "moduleResolution": "node",
     "sourceMap": true,
     "skipLibCheck": true,

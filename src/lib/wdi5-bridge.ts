@@ -72,11 +72,11 @@ function initMultiRemoteBrowser() {
     ;["asControl", "goTo", "screenshot", "waitForUI5", "getUI5Version", "getSelectorForElement", "allControls"].forEach(
         (command) => {
             browser.addCommand(command, async (...args) => {
-                const multiRemoteInstance = browser as unknown as MultiRemoteDriver
+                const multiRemoteInstance = browser as unknown
                 const result = []
-                multiRemoteInstance.instances.forEach((name) => {
-                    result.push(multiRemoteInstance[name][command].apply(this, args))
-                })
+                // multiRemoteInstance.instances.forEach((name) => {
+                //     result.push(multiRemoteInstance[name][command].apply(this, args))
+                // })
                 return Promise.all(result)
             })
         }
