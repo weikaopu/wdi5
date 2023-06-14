@@ -5,23 +5,23 @@ import * as semver from "semver"
 import { mark as marky_mark, stop as marky_stop } from "marky"
 
 import { clientSide_ui5Object, clientSide_ui5Response, wdi5Config, wdi5Selector } from "../types/wdi5.types"
-// import { MultiRemoteDriver } from "webdriverio/build/multiremote"
+import { MultiRemoteDriver } from "webdriverio/build/multiremote"
 import { WDI5Control } from "./wdi5-control.js"
-// import { WDI5FE } from "./wdi5-fe.js"
-import { clientSide_injectTools } from "../../client-side-js/injectTools.cjs"
-import { clientSide_injectUI5 } from "../../client-side-js/injectUI5.cjs"
-import { clientSide_getSelectorForElement } from "../../client-side-js/getSelectorForElement.cjs"
-import { clientSide__checkForUI5Ready } from "../../client-side-js/_checkForUI5Ready.cjs"
-import { clientSide_getObject } from "../../client-side-js/getObject.cjs"
-import { clientSide_getUI5Version } from "../../client-side-js/getUI5Version.cjs"
-import { clientSide__navTo } from "../../client-side-js/_navTo.cjs"
-import { clientSide_allControls } from "../../client-side-js/allControls.cjs"
+import { WDI5FE } from "./wdi5-fe.js"
+import { clientSide_injectTools } from "../../client-side-js/injectTools.js"
+import { clientSide_injectUI5 } from "../../client-side-js/injectUI5.js"
+import { clientSide_getSelectorForElement } from "../../client-side-js/getSelectorForElement.js"
+import { clientSide__checkForUI5Ready } from "../../client-side-js/_checkForUI5Ready.js"
+import { clientSide_getObject } from "../../client-side-js/getObject.js"
+import { clientSide_getUI5Version } from "../../client-side-js/getUI5Version.js"
+import { clientSide__navTo } from "../../client-side-js/_navTo.js"
+import { clientSide_allControls } from "../../client-side-js/allControls.js"
 import { Logger as _Logger } from "./Logger.js"
 import { WDI5Object } from "./wdi5-object.js"
-// import BTPAuthenticator from "./authentication/BTPAuthenticator.js"
-// import BasicAuthenticator from "./authentication/BasicAuthenticator.js"
-// import CustomAuthenticator from "./authentication/CustomAuthenticator.js"
-// import Office365Authenticator from "./authentication/Office365Authenticator.js"
+import BTPAuthenticator from "./authentication/BTPAuthenticator.js"
+import BasicAuthenticator from "./authentication/BasicAuthenticator.js"
+import CustomAuthenticator from "./authentication/CustomAuthenticator.js"
+import Office365Authenticator from "./authentication/Office365Authenticator.js"
 
 const Logger = _Logger.getInstance()
 
@@ -44,14 +44,14 @@ export async function setup(config: wdi5Config) {
     // jump-start the desired log level
     Logger.setLogLevel(config.wdi5.logLevel || "error")
 
-    // if (browser instanceof MultiRemoteDriver) {
-    //     ;(browser as MultiRemoteDriver).instances.forEach((name) => {
-    //         initBrowser(browser[name])
-    //     })
-    //     initMultiRemoteBrowser()
-    // } else {
-    initBrowser(browser)
-    // }
+    if (browser instanceof MultiRemoteDriver) {
+        ;(browser as MultiRemoteDriver).instances.forEach((name) => {
+            initBrowser(browser[name])
+        })
+        initMultiRemoteBrowser()
+    } else {
+        initBrowser(browser)
+    }
 
     _setupComplete = true
 }
@@ -74,9 +74,9 @@ function initMultiRemoteBrowser() {
             browser.addCommand(command, async (...args) => {
                 const multiRemoteInstance = browser as unknown
                 const result = []
-                // multiRemoteInstance.instances.forEach((name) => {
-                //     result.push(multiRemoteInstance[name][command].apply(this, args))
-                // })
+                multiRemoteInstance.instances.forEach((name) => {
+                    result.push(multiRemoteInstance[name][command].apply(this, args))
+                })
                 return Promise.all(result)
             })
         }
@@ -92,9 +92,9 @@ function initBrowser(browserInstance: WebdriverIO.Browser) {
 
     _addWdi5Commands(browserInstance)
 
-    // if (!(browserInstance as any).fe) {
-    //     ;(browserInstance as any).fe = WDI5FE
-    // }
+    if (!(browserInstance as any).fe) {
+        ;(browserInstance as any).fe = WDI5FE
+    }
 
     _setupComplete = true
 }
@@ -148,16 +148,16 @@ export async function checkForUI5Page(browserInstance) {
 export async function authenticate(options, browserInstanceName?) {
     switch (options.provider) {
         case "BTP":
-            // await new BTPAuthenticator(options, browserInstanceName).login()
+            await new BTPAuthenticator(options, browserInstanceName).login()
             break
         case "BasicAuth":
-            // await new BasicAuthenticator(browserInstanceName).login()
+            await new BasicAuthenticator(browserInstanceName).login()
             break
         case "Office365":
-            // await new Office365Authenticator(options, browserInstanceName).login()
+            await new Office365Authenticator(options, browserInstanceName).login()
             break
         case "custom":
-        // await new CustomAuthenticator(options, browserInstanceName).login()
+            await new CustomAuthenticator(options, browserInstanceName).login()
         default:
             break
     }
