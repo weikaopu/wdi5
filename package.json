@@ -38,7 +38,7 @@
     "clean": "rimraf dist/*",
     "compile": "tsc --p tsconfig.json",
     "compile:esm": "tsc --p tsconfig-esm.json",
-    "build": "run-s -c clean compile compile:esm",
+    "build": "run-s -c clean compile compile:esm copy:packageJson setTypeCommonJs setTypeModule",
     "build:watch": "tsc -w --p tsconfig.json",
     "build:watch:esm": "tsc -w --p tsconfig-esm.json",
     "// test time": "refers to testing wdio-ui5-service",
@@ -65,10 +65,9 @@
     "prepare": "husky install",
     "release": "standard-version",
     "startDoc": "docsify serve ./docs",
-    "setTypeCommonJs": "npm pkg set 'type'='commonjs'",
-    "setTypeModule": "npm pkg set 'type'='module'",
-    "copy:CJSpackage": "",
-    "copy:ESMpackage": ""
+    "setTypeCommonJs": "npm pkg set 'type'='commonjs' -c ./dist/cjs/package.json",
+    "setTypeModule": "npm pkg set 'type'='module' -c ./dist/esm/package.json",
+    "copy:packageJson": "node ./scripts/copyPackage.js "
   },
   "lint-staged": {
     "*": "prettier --ignore-unknown --write",
