@@ -64,7 +64,11 @@
     "test": "cross-env TS_NODE_PROJECT=\"test/tsconfig.json\" mocha",
     "prepare": "husky install",
     "release": "standard-version",
-    "startDoc": "docsify serve ./docs"
+    "startDoc": "docsify serve ./docs",
+    "setTypeCommonJs": "npm pkg set 'type'='commonjs'",
+    "setTypeModule": "npm pkg set 'type'='module'",
+    "copy:CJSpackage": "",
+    "copy:ESMpackage": ""
   },
   "lint-staged": {
     "*": "prettier --ignore-unknown --write",
