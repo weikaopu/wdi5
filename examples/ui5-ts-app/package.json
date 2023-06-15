@@ -4,6 +4,7 @@
   "private": true,
   "description": "UI5 Application: tsapp",
   "author": "nosotros-todos@ui5-community.org",
+  "type": "module",
   "license": "Apache-2.0",
   "scripts": {
     "start": "npm-run-all --parallel watch:ts start:ui5",

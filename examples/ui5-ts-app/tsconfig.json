@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "module": "CommonJS",
+    "module": "ESNext",
     "types": [
       "node",
       "webdriverio/async",
@@ -9,6 +9,6 @@
       "wdio-ui5-service/dist",
       "@openui5/types"
     ],
-    "target": "es2015"
+    "target": "ESNext"
   }
 }
