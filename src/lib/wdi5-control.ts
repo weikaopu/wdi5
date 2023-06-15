@@ -1,5 +1,5 @@
 import * as util from "util"
-import { ELEMENT_KEY } from "webdriverio/build/constants"
+import * as constants from "webdriverio/build/constants"
 import { clientSide_getControl } from "../../client-side-js/getControl.js"
 import { clientSide_interactWithControl } from "../../client-side-js/interactWithControl.js"
 import { clientSide_executeControlMethod } from "../../client-side-js/executeControlMethod.js"
@@ -670,7 +670,7 @@ export class WDI5Control {
 
         // When the WebDriver protocol is not used, the domElement is not set accordingly (via devtool protocol)
         // Therefore we get element reference by calling browser execute function manually
-        if (_result.status === 0 && !_result.domElement[ELEMENT_KEY]) {
+        if (_result.status === 0 && !_result.domElement[constants.ELEMENT_KEY]) {
             const elementReference = (await this._browserInstance.execute((id) => {
                 const webElement: Node = document.evaluate(
                     `//*[@id='${id}']`,

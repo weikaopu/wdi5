@@ -5,7 +5,7 @@ import * as semver from "semver"
 import { mark as marky_mark, stop as marky_stop } from "marky"
 
 import { clientSide_ui5Object, clientSide_ui5Response, wdi5Config, wdi5Selector } from "../types/wdi5.types"
-import { MultiRemoteDriver } from "webdriverio/build/multiremote"
+import * as multiremote from "webdriverio/build/multiremote.js"
 import { WDI5Control } from "./wdi5-control.js"
 import { WDI5FE } from "./wdi5-fe.js"
 import { clientSide_injectTools } from "../../client-side-js/injectTools.js"
@@ -44,8 +44,8 @@ export async function setup(config: wdi5Config) {
     // jump-start the desired log level
     Logger.setLogLevel(config.wdi5.logLevel || "error")
 
-    if (browser instanceof MultiRemoteDriver) {
-        ;(browser as MultiRemoteDriver).instances.forEach((name) => {
+    if (browser instanceof multiremote.MultiRemoteDriver) {
+        ;(browser as multiremote.MultiRemoteDriver).instances.forEach((name) => {
             initBrowser(browser[name])
         })
         initMultiRemoteBrowser()

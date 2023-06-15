@@ -1,5 +1,5 @@
 import { initOPA, addToQueue, emptyQueue, loadFELibraries } from "../../client-side-js/testLibrary.js"
-import { Logger as _Logger } from "./Logger"
+import { Logger as _Logger } from "./Logger.js"
 const Logger = _Logger.getInstance()
 
 const commonFunctions = ["and", "then", "when"]
