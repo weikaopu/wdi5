@@ -24,7 +24,8 @@ $> npm i
 # build entire proj once
 $> npm run build
 # turn on build watcher
-$> npm run build:watch
+$> npm run watch:esm
+$> npm run watch:cjs
 ```
 
 Then to work on a test:
@@ -85,7 +86,7 @@ Most prominently is `"."`, which refers to `wdi5` (aka `wdio-ui5-service`) itsel
 - assure continously transpiling TS -> JS on `**/*.ts` changes via
 
   ```shell
-  $> npm run build:watch
+  $> npm run watch:esm
   ```
 
 ## work on `wdi5`
@@ -104,11 +105,11 @@ All browser-scope commands (such as `browser.asControl()`) are provided with `/s
 
 `wdi5` comes with it's own general-purpose Logger that can be used in the Node.js scope: `/src/lib/Logger.ts`.
 
-Given the continous build watch is running (`npm run build:watch`), hack away at any part!
+Given the continous build watch is running (`npm run watch:esm`), hack away at any part!
 
 ### control instantiation
 
-Here's a visualization of how UI5 controls are transferred between Node.js- and browser-scope.  
+Here's a visualization of how UI5 controls are transferred between Node.js- and browser-scope.
 Not the difference between the generic [`browser.asControl($selector)`](/usage#ascontrol) and [`browser.allControls($selector)`](/usage#allcontrols).
 
 ![wdi5 control instantiation](./wdi5-control-instantiation.png)
