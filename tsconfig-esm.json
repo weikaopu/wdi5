@@ -1,17 +1,9 @@
 {
+  "extends": "./tsconfig.json",
   "compilerOptions": {
-    "rootDir": "src",
-    "esModuleInterop": true,
     "target": "ES2022",
     "outDir": "dist/mjs",
     "module": "ES2022",
-    "moduleResolution": "node",
-    "sourceMap": true,
-    "skipLibCheck": true,
-    "declaration": true,
-    "declarationMap": true,
-    "downlevelIteration": true,
-    "types": ["node", "webdriverio/async", "@wdio/mocha-framework", "openui5"]
-  },
-  "include": ["src"]
+    "moduleResolution": "node"
+  }
 }

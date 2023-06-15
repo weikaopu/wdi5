@@ -1,8 +1,7 @@
 {
   "compilerOptions": {
-    "esModuleInterop": true,
-    "outDir": "dist/cjs",
-    "module": "CommonJS",
+    "noEmit": true,
+    "rootDir": "src",
     "sourceMap": true,
     "skipLibCheck": true,
     "declaration": true,
