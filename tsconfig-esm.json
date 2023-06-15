@@ -2,7 +2,7 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "target": "ES2022",
-    "outDir": "dist/mjs",
+    "outDir": "./dist/mjs/",
     "module": "ES2022",
     "moduleResolution": "node"
   }
