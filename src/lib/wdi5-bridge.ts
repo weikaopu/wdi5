@@ -390,42 +390,72 @@ export async function _addWdi5Commands(browserInstance: WebdriverIO.Browser) {
     //    via the below "then"-ing of the (async wdi5._executeControlMethod() => Promise)-Promises with the help of
     //    the a Proxy and a recursive `handler` function
     if (!browserInstance.asControl) {
+        // Define a function 'asControl' on the 'browserInstance' object.
+        // This function takes 'ui5ControlSelector' as a parameter and returns a Proxy object.
         browserInstance.asControl = function (ui5ControlSelector) {
+            // An array containing names of asynchronous methods ('then', 'catch', and 'finally').
+            // These methods are later used to check if a method is asynchronous and should be chained in the fluent API.
             const asyncMethods = ["then", "catch", "finally"]
+
+            // An array that will store the names of functions called on the fluent API.
             const functionQueue = []
-            // we need to do the same operation as in the 'init' of 'wdi5-control.ts'
+
+            // Check if 'ui5ControlSelector.logging' is defined and not null.
+            // If it's undefined or null, set the variable 'logging' to true, indicating that logging is enabled by default.
+            // Otherwise, use the value of 'ui5ControlSelector.logging'.
             const logging = ui5ControlSelector?.logging ?? true
+
+            // Define a function called 'makeFluent' that takes a 'target' object as a parameter.
             function makeFluent(target) {
+                // Convert the 'target' object to a Promise using 'Promise.resolve()'.
                 const promise = Promise.resolve(target)
+
+                // Define a Proxy handler with 'get' and 'apply' trap methods.
                 const handler = {
+                    // The 'get' trap is called when a property is accessed on the proxy.
                     get(_, prop) {
+                        // Add the accessed property name to the 'functionQueue'.
                         functionQueue.push(prop)
-                        return asyncMethods.includes(prop)
-                            ? (...boundArgs) => makeFluent(promise[prop](...boundArgs))
-                            : makeFluent(
-                                  promise.then((object) => {
-                                      // when object is undefined the previous function call failed
-                                      try {
-                                          return object[prop]
-                                      } catch (error) {
-                                          // different node versions return a different `error.message` so we use our own message
-                                          if (logging) {
-                                              Logger.error(`Cannot read property '${prop}' in the execution queue!`)
-                                          }
-                                      }
-                                  })
-                              )
+
+                        // Check if the accessed property is one of the asynchronous methods.
+                        if (asyncMethods.includes(prop)) {
+                            // If it's asynchronous, return a new function as the proxy target.
+                            // This function will execute the corresponding method on the 'promise' with the provided arguments (if any).
+                            return (...boundArgs) => makeFluent(promise[prop](...boundArgs))
+                        } else {
+                            // If the accessed property is not asynchronous, return a new function as the proxy target.
+                            // This function will execute 'promise.then()' with a callback to handle property access.
+                            return makeFluent(
+                                promise.then((object) => {
+                                    try {
+                                        // Access the property on the 'object' (resolved value of the Promise).
+                                        return object[prop]
+                                    } catch (error) {
+                                        // Handle any errors that occur during property access.
+                                        // If 'logging' is enabled, log an error indicating the property access failure.
+                                        if (logging) {
+                                            Logger.error(`Cannot read property '${prop}' in the execution queue!`)
+                                        }
+                                    }
+                                })
+                            )
+                        }
                     },
+                    // The 'apply' trap is called when the proxy is called as a function.
                     apply(_, thisArg, boundArgs) {
+                        // Return a new function as the proxy target.
+                        // This function will execute 'promise.then()' with a callback to handle function calls.
                         return makeFluent(
-                            // When "targetFunction" is empty we can assume that there are errors in the execution queue
                             promise.then((targetFunction) => {
                                 if (targetFunction) {
+                                    // If 'targetFunction' is not empty, call it with the provided arguments.
+                                    // This enables the execution of chained function calls in the fluent API.
                                     return Reflect.apply(targetFunction, thisArg, boundArgs)
                                 } else {
-                                    // a functionQueue without a 'then' can be ignored
-                                    // as the original error was already logged
+                                    // If 'targetFunction' is empty, it means there are errors in the execution queue.
+                                    // Check if the 'functionQueue' contains a 'then' method (an asynchronous method).
                                     if (functionQueue.includes("then") && logging) {
+                                        // Remove the 'then' method from the 'functionQueue' and log an error.
                                         functionQueue.splice(functionQueue.indexOf("then"))
                                         Logger.error(
                                             `One of the calls in the queue "${functionQueue.join(
@@ -438,9 +468,16 @@ export async function _addWdi5Commands(browserInstance: WebdriverIO.Browser) {
                         )
                     }
                 }
+
+                // Return a new Proxy with an empty function as the target and the defined 'handler'.
+                // The 'handler' will handle property access and function calls on the returned Proxy object.
                 // eslint-disable-next-line @typescript-eslint/no-empty-function
                 return new Proxy(function () {}, handler)
             }
+
+            // Call the 'makeFluent' function with the result of 'browserInstance._asControl(ui5ControlSelector)' as the target.
+            // The returned value will be a Proxy object that enables chaining of methods.
+            // '@ts-ignore' is used to suppress TypeScript errors related to the custom Proxy usage.
             // @ts-ignore
             return makeFluent(browserInstance._asControl(ui5ControlSelector))
         }
