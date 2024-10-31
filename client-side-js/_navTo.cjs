@@ -1,9 +1,8 @@
 async function clientSide__navTo(sComponentId, sName, oParameters, oComponentTargetInfo, bReplace, browserInstance) {
-    return await browserInstance.execute(
+    return browserInstance.execute(
         async (sComponentId, sName, oParameters, oComponentTargetInfo, bReplace) => {
-
             try {
-                await window.bridge.waitForUI5(window.wdi5.waitForUI5Options)
+                await window.wdi5.waitForUI5(window.wdi5.waitForUI5Options)
             } catch (error) {
                 return window.wdi5.errorHandling(error)
             }

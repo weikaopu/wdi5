@@ -1,7 +1,7 @@
 //> REVISIT: do we need this at all?
 // -> as .fireEvent on a UI5 control in Node.js-scope is discouraged
 async function clientSide_fireEvent(webElement, eventName, oOptions, browserInstance) {
-    return await browserInstance.execute(
+    return browserInstance.execute(
         async (webElement, eventName, oOptions) => {
             try {
                 await window.wdi5.waitForUI5(window.wdi5.waitForUI5Options)

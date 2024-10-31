@@ -135,10 +135,16 @@ export async function injectUI5(config: wdi5Config, browserInstance) {
 
     const version = await (browserInstance as WebdriverIO.Browser).getUI5Version()
     checkUI5Version(version)
-    await clientSide_injectTools(browserInstance) // helpers for wdi5 browser scope
-    // BIDI does not allow to pass functions inside of the browser scope
-    await clientSide_injectXHRPatch(config.wdi5, browserInstance)
-    result = result && (await clientSide_injectUI5(waitForUI5Timeout, browserInstance))
+    // await clientSide_injectTools(browserInstance) // helpers for wdi5 browser scope
+    // // BIDI does not allow to pass functions inside of the browser scope
+    // await clientSide_injectXHRPatch(config.wdi5, browserInstance)
+    // result = result && (await clientSide_injectUI5(waitForUI5Timeout, browserInstance))
+
+    result = await Promise.all([
+        clientSide_injectTools(browserInstance),
+        clientSide_injectXHRPatch(config.wdi5, browserInstance),
+        clientSide_injectUI5(waitForUI5Timeout, browserInstance)
+    ])
 
     // we are not using _controls as an array, we are using it as an object. That's why the length property
     // is not updated right away: https://stackoverflow.com/a/4424026
@@ -166,7 +172,7 @@ export async function checkForUI5Page(browserInstance) {
         return checkState.state === "complete" && checkState.sapReady
     })
     // sap in global window namespace denotes (most likely :) ) that ui5 is present
-    return await browserInstance.execute(() => {
+    return browserInstance.execute(() => {
         return !!window.sap
     })
 }

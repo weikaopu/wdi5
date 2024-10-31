@@ -1,5 +1,5 @@
 async function clientSide_injectUI5(waitForUI5Timeout, browserInstance) {
-    return await browserInstance.execute(async (waitForUI5Timeout) => {
+    return browserInstance.execute(async (waitForUI5Timeout) => {
         if (window.bridge) {
             // setup sap testing already done
             return true
@@ -434,7 +434,7 @@ async function clientSide_injectUI5(waitForUI5Timeout, browserInstance) {
                     }
                 }
             )
-            return await setupPromise
+            return setupPromise
         }
     }, waitForUI5Timeout)
 }

@@ -11,7 +11,7 @@ if (global.browser) {
  * @param {Object} args proxied arguments to UI5 control method at runtime
  */
 async function executeControlMethod(webElement, methodName, browserInstance, args) {
-    return await browserInstance.execute(
+    return browserInstance.execute(
         async (webElement, methodName, args) => {
             return new Promise(async (resolve, reject) => {
                 await window.wdi5.waitForUI5(

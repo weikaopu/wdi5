@@ -1,5 +1,5 @@
 async function clientSide_executeObjectMethod(uuid, methodName, args) {
-    return await browser.execute(
+    return browser.execute(
         async (uuid, methodName, args) => {
             return new Promise(async (resolve, reject) => {
                 await window.wdi5.waitForUI5(

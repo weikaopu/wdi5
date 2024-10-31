@@ -1,6 +1,6 @@
 async function clientSide_interactWithControl(oOptions, browserInstance) {
     browserInstance = await Promise.resolve(browserInstance)
-    return await browserInstance.execute(async (oOptions) => {
+    return browserInstance.execute(async (oOptions) => {
         try {
             await window.wdi5.waitForUI5(window.wdi5.waitForUI5Options)
         } catch (error) {

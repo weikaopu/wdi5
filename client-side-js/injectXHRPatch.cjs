@@ -1,5 +1,5 @@
 async function clientSide_injectXHRPatch(wdi5Config, browserInstance) {
-    return await browserInstance.execute(async (wdi5Config) => {
+    return browserInstance.execute(async (wdi5Config) => {
         const originalFetch = window.fetch
 
         const ignoreAutoWaitUrls = wdi5Config.ignoreAutoWaitUrls
