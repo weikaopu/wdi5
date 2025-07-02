@@ -4,12 +4,14 @@ import Authenticator from "./Authenticator.js"
 class BTPAuthenticator extends Authenticator {
     private disableBiometricAuth: boolean
     private idpDomain: string
+    private idpDomainOpt: string
 
     constructor(options: BTPAuthenticatorType, browserInstanceName) {
         super(browserInstanceName)
         this.usernameSelector = options.usernameSelector ?? "#j_username"
         this.passwordSelector = options.passwordSelector ?? "#j_password"
         this.submitSelector = options.submitSelector ?? "#logOnFormSubmit"
+        this.idpDomainOpt = options.idpDomain
         this.disableBiometricAuth = options.disableBiometricAuthentication ?? false
         if (this.disableBiometricAuth) {
             if (!options.idpDomain) {
@@ -30,7 +32,21 @@ class BTPAuthenticator extends Authenticator {
     }
 
     async login() {
+        const idpDomainOpt = this.idpDomainOpt
         if (!(await this.getIsLoggedIn())) {
+            // e.g. <a href="saml/discovery?returnIDParam=idp&amp;entityID=https://integrationtest.authentication.eu10.hana.ondemand.com&amp;idp=abybs5za0.accounts.ondemand.com&amp;isPassive=true" class="saml-login-link">SAP IAS</a>
+            const targetIdpEle = await this.browserInstance.waitUntil(
+                async function () {
+                    return await $(`a[href*="idp=${idpDomainOpt}"]`)
+                },
+                {
+                    timeout: 10000,
+                    timeoutMsg: `expected idp: ${idpDomainOpt} can not be retrieved after 10s.`
+                }
+            )
+            if (!!targetIdpEle) {
+                targetIdpEle.click()
+            }
             const usernameControl = await this.browserInstance.$(this.usernameSelector)
             const passwordControl = await this.browserInstance.$(this.passwordSelector)
             const submit = await this.browserInstance.$(this.submitSelector)
