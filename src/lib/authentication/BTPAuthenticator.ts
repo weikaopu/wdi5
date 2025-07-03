@@ -32,20 +32,13 @@ class BTPAuthenticator extends Authenticator {
     }
 
     async login() {
-        const idpDomainOpt = this.idpDomainOpt
         if (!(await this.getIsLoggedIn())) {
-            // e.g. <a href="saml/discovery?returnIDParam=idp&amp;entityID=https://integrationtest.authentication.eu10.hana.ondemand.com&amp;idp=abybs5za0.accounts.ondemand.com&amp;isPassive=true" class="saml-login-link">SAP IAS</a>
-            const targetIdpEle = await this.browserInstance.waitUntil(
-                async function () {
-                    return await $(`a[href*="idp=${idpDomainOpt}"]`)
-                },
-                {
-                    timeout: 10000,
-                    timeoutMsg: `expected idp: ${idpDomainOpt} can not be retrieved after 10s.`
+            if (!!this.idpDomainOpt) {
+                // e.g. <a href="saml/discovery?returnIDParam=idp&amp;entityID=https://integrationtest.authentication.eu10.hana.ondemand.com&amp;idp=abybs5za0.accounts.ondemand.com&amp;isPassive=true" class="saml-login-link">SAP IAS</a>
+                const targetIdpEle = await this.browserInstance.$(`a[href*="idp=${this.idpDomainOpt}"]`)
+                if (!!targetIdpEle.elementId) {
+                    targetIdpEle.click()
                 }
-            )
-            if (!!targetIdpEle) {
-                targetIdpEle.click()
             }
             const usernameControl = await this.browserInstance.$(this.usernameSelector)
             const passwordControl = await this.browserInstance.$(this.passwordSelector)

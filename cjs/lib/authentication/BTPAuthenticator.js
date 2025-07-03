@@ -91,76 +91,64 @@ var BTPAuthenticator = /** @class */ (function (_super) {
     };
     BTPAuthenticator.prototype.login = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var idpDomainOpt, targetIdpEle, usernameControl, passwordControl, submit, wdi5Username, wdi5Password, password;
+            var targetIdpEle, usernameControl, passwordControl, submit, wdi5Username, wdi5Password, password;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0:
-                        idpDomainOpt = this.idpDomainOpt;
-                        return [4 /*yield*/, this.getIsLoggedIn()];
+                    case 0: return [4 /*yield*/, this.getIsLoggedIn()];
                     case 1:
-                        if (!!(_a.sent())) return [3 /*break*/, 17];
-                        return [4 /*yield*/, this.browserInstance.waitUntil(function () {
-                                return __awaiter(this, void 0, void 0, function () {
-                                    return __generator(this, function (_a) {
-                                        switch (_a.label) {
-                                            case 0: return [4 /*yield*/, $("a[href*=\"idp=".concat(idpDomainOpt, "\"]"))];
-                                            case 1: return [2 /*return*/, _a.sent()];
-                                        }
-                                    });
-                                });
-                            }, {
-                                timeout: 10000,
-                                timeoutMsg: "expected idp: ".concat(idpDomainOpt, " can not be retrieved after 10s.")
-                            })];
+                        if (!!(_a.sent())) return [3 /*break*/, 18];
+                        if (!!!this.idpDomainOpt) return [3 /*break*/, 3];
+                        return [4 /*yield*/, this.browserInstance.$("a[href*=\"idp=".concat(this.idpDomainOpt, "\"]"))];
                     case 2:
                         targetIdpEle = _a.sent();
-                        if (!!targetIdpEle) {
+                        if (!!targetIdpEle.elementId) {
                             targetIdpEle.click();
                         }
-                        return [4 /*yield*/, this.browserInstance.$(this.usernameSelector)];
-                    case 3:
+                        _a.label = 3;
+                    case 3: return [4 /*yield*/, this.browserInstance.$(this.usernameSelector)];
+                    case 4:
                         usernameControl = _a.sent();
                         return [4 /*yield*/, this.browserInstance.$(this.passwordSelector)];
-                    case 4:
+                    case 5:
                         passwordControl = _a.sent();
                         return [4 /*yield*/, this.browserInstance.$(this.submitSelector)];
-                    case 5:
+                    case 6:
                         submit = _a.sent();
                         wdi5Username = this.getUsername();
                         wdi5Password = this.getPassword();
                         return [4 /*yield*/, passwordControl.isExisting()];
-                    case 6:
-                        if (!_a.sent()) return [3 /*break*/, 10];
-                        return [4 /*yield*/, usernameControl.setValue(wdi5Username)];
                     case 7:
-                        _a.sent();
-                        return [4 /*yield*/, passwordControl.setValue(wdi5Password)];
+                        if (!_a.sent()) return [3 /*break*/, 11];
+                        return [4 /*yield*/, usernameControl.setValue(wdi5Username)];
                     case 8:
                         _a.sent();
-                        return [4 /*yield*/, submit.click()];
+                        return [4 /*yield*/, passwordControl.setValue(wdi5Password)];
                     case 9:
                         _a.sent();
-                        return [3 /*break*/, 16];
-                    case 10: return [4 /*yield*/, usernameControl.setValue(wdi5Username)];
-                    case 11:
-                        _a.sent();
                         return [4 /*yield*/, submit.click()];
+                    case 10:
+                        _a.sent();
+                        return [3 /*break*/, 17];
+                    case 11: return [4 /*yield*/, usernameControl.setValue(wdi5Username)];
                     case 12:
                         _a.sent();
-                        return [4 /*yield*/, this.browserInstance.$(this.passwordSelector)];
+                        return [4 /*yield*/, submit.click()];
                     case 13:
+                        _a.sent();
+                        return [4 /*yield*/, this.browserInstance.$(this.passwordSelector)];
+                    case 14:
                         password = _a.sent();
                         return [4 /*yield*/, password.setValue(wdi5Password)];
-                    case 14:
-                        _a.sent();
-                        return [4 /*yield*/, submit.click()];
                     case 15:
                         _a.sent();
-                        _a.label = 16;
+                        return [4 /*yield*/, submit.click()];
                     case 16:
-                        this.setIsLoggedIn(true);
+                        _a.sent();
                         _a.label = 17;
-                    case 17: return [2 /*return*/];
+                    case 17:
+                        this.setIsLoggedIn(true);
+                        _a.label = 18;
+                    case 18: return [2 /*return*/];
                 }
             });
         });
